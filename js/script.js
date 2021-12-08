@@ -3,18 +3,26 @@ const title = document.querySelector('.title-input')
 const author = document.querySelector('.author-input')
 const priority = document.querySelector('.priority')
 const category = document.querySelector('.category')
-const submit = document.querySelector('input[type="submit"]')
+const submit = document.querySelector('.submit-btn')
 
+// creates list of validation warnings
 const warningList = document.createElement('ul')
 form.insertBefore(warningList, submit)
 
+// creates list of added books
 const bookList = document.createElement('ul')
 bookList.setAttribute('class', 'book-list')
 document.body.appendChild(bookList)
 
-let storageBook = JSON.parse(localStorage.getItem('libraryArr'))
+// gets an array of added books from local storage
+let storageBook = JSON.parse(localStorage.getItem('library'))
+  ? JSON.parse(localStorage.getItem('library'))
+  : []
 
-if (storageBook !== null) {
+// creates a list item of book list
+const createBookList = () => {
+  bookList.innerHTML = ''
+
   for (let i = 0; i < storageBook.length; i++) {
     const bookListItem = document.createElement('li')
     bookListItem.setAttribute('class', 'book-list-item')
@@ -54,10 +62,11 @@ if (storageBook !== null) {
     bookInfo.appendChild(bookCategory)
   }
 }
+createBookList()
 
+// adds books to the list
 const addBook = () => {
-  let libraryArr = []
-  let book = {
+  const book = {
     title: title.value,
     author: author.value,
     priority: priority.value,
@@ -65,8 +74,10 @@ const addBook = () => {
     id: Date.now(),
   }
 
-  libraryArr.push(book)
-  localStorage.setItem('libraryArr', JSON.stringify(libraryArr))
+  storageBook.push(book)
+  localStorage.setItem('library', JSON.stringify(storageBook))
+
+  createBookList()
 
   title.value = ''
   author.value = ''
@@ -74,13 +85,14 @@ const addBook = () => {
   category.value = ''
 }
 
+// form validation adding books to the library
 const formValidation = (event) => {
   event.preventDefault()
 
   warningList.innerHTML = ''
 
-  let minTitleLength = 1
-  let minAuthorLength = 3
+  const minTitleLength = 1
+  const minAuthorLength = 3
 
   if (title.value.length <= minTitleLength) {
     title.classList.add('warning')
